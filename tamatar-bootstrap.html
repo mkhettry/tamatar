@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap 101 Template</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/app.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <h1>Ready?</h1>
+
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="input-group">
+          <input id="pomo-title" type="text" class="form-control" placeholder="What do you want to work on?">
+          <span class="input-group-btn">
+            <button id="go-button" class="btn btn-default" type="button">Go!</button>
+          </span>
+        </div><!-- /input-group -->
+      </div><!-- /.col-lg-6 -->
+    </div><!-- /.row --> 
+    
+    <div class="row" id="running">
+      <div class="col-lg-3" id="counter">
+        25.00
+      </div>
+      <div class="col-lg-3">
+        <button id="cancel-button" class="btn btn-default" type="button">Cancel</button>
+      </div>
+    </div>
+                
+    <div class="row">
+      <div class="col-lg-6" id="counter">
+        <div class="alert alert-success">Example of the successful alert box</div>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-lg-6" id="counter">
+        <div class="alert alert-warning">Example of a failed alert box</div>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6" id="history">
+        <hr>
+        <h2>History</h2>
+        <ul class="list-group">
+        </ul>
+      </div>
+      
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    
+    <script src="js/jquery-1.11.0.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/date.format.js"></script>
+    <script>
+      $("#running").hide();
+      $(".alert").hide();
+      var globalState = {};
+      
+      function calculateTimeRemaining(startTime, durationSeconds) {
+          var secondsElapsed = ((new Date()).getTime() - startTime) / 1000;
+          return Math.floor(durationSeconds - secondsElapsed);
+      }
+      
+      function showTimeRemaining(timeLeftSeconds) {
+          var minutesRemaining = Math.floor((timeLeftSeconds) / 60);
+          var secondsRemaining = timeLeftSeconds % 60
+          if (secondsRemaining < 10) {
+            secondsRemaining = "0" + secondsRemaining;
+          }
+          return (minutesRemaining + ":" + secondsRemaining);
+        }
+
+      function startTimer(durationSeconds, onTimerEnd) {
+         var startTime = (new Date()).getTime();
+                         
+         var timer = setInterval(function () {
+                                 var secondsLeft = calculateTimeRemaining(startTime, 8);
+                                 $("#counter").text(showTimeRemaining(secondsLeft));
+                                 if (secondsLeft <= 0) {
+                                   clearTimeout(timer);
+                                   onTimerEnd();
+                                }}, 400);
+         return timer;
+       }
+      
+     function pomodoroComplete(success) {
+         if (globalState.state !== "InPomodoro") {
+            return;
+         }
+         var title = globalState.currentPomodoro;
+         var alertElement = null; 
+         var msgClass = null;           
+         if (success) {                                                    
+             alertElement = $(".alert-success");
+             alertElement.html("Pomodoro completed");
+             msgClass = "list-group-item-success";                                                    
+                                                    
+         } else {
+             alertElement = $(".alert-warning");
+             alertElement.html("Pomodoro cancelled");
+             msgClass = "list-group-item-warning";
+         }                                                    
+         alertElement.fadeIn();                 
+         var finishTime = new Date();
+         setTimeout(function() { alertElement.fadeOut(2000); }, 2000);
+         $("#history ul").prepend("<li class=\"" + msgClass + "\">" + 
+                                                title + " " + 
+                                                finishTime.format("m/d/yy hh:mm TT") +
+                                  "</li>");
+                                                    
+     }                                                    
+                                                    
+     function readyForNext() {
+       $(".input-group").show();
+       $("#running").hide(1000);
+     }
+                                                    
+     function updateState(state) {
+        globalState.state = state;                                                    
+        $("h1").html(state);                                                             
+     };
+
+                                                    
+     $("#cancel-button").click(function() {
+        if (globalState.state === "InPomodoro") {
+             pomodoroComplete(false);
+             updateState("Ready?");
+             readyForNext();                                                           
+        }                                                     
+     });                                                    
+                                                    
+     $("#go-button").click(function() {
+        var startTime = (new Date()).getTime();
+        globalState.currentPomodoro = $("#pomo-title").val();
+        updateState("InPomodoro");
+        var timer = startTimer(8, function() {
+                         pomodoroComplete(true);
+                         updateState("Resting");
+                         startTimer(5, function() {
+                                          updateState("Ready?");
+                                          readyForNext();
+                                       });
+                      });
+        globalState.timer = timer;
+        $(".input-group").hide();
+        $("#running").show();
+        
+      });
+    </script>
+  </body>
+</html>
