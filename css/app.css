@@ -1,4 +1,17 @@
 #counter {
-  font-size: 20px;
+  font-size: 150px;
 }
 
+input {
+    500px;
+}
+
+.history {
+    width: 650px;
+}
+
+.pomo-end {
+    float:right;
+    border-left: 1px solid;
+    padding-left: 10px;
+}

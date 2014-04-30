@@ -18,50 +18,41 @@
     <![endif]-->
   </head>
   <body>
-    <h1>Ready?</h1>
+
+    <div class="container-fluid">
 
     <div class="row">
-      <div class="col-lg-6">
+    <div class="col-md-1" id="state">
+      Waiting
+    </div>
+    </div>
+    
+    <div class="row" id="running">
+      <div class="col-md-3 col-md-offset-4" id="counter">
+        25.00
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
         <div class="input-group">
           <input id="pomo-title" type="text" class="form-control" placeholder="What do you want to work on?">
           <span class="input-group-btn">
             <button id="go-button" class="btn btn-default" type="button">Go!</button>
           </span>
         </div><!-- /input-group -->
-      </div><!-- /.col-lg-6 -->
-    </div><!-- /.row --> 
-    
-    <div class="row" id="running">
-      <div class="col-lg-3" id="counter">
-        25.00
-      </div>
-      <div class="col-lg-3">
-        <button id="cancel-button" class="btn btn-default" type="button">Cancel</button>
-      </div>
-    </div>
-                
-    <div class="row">
-      <div class="col-lg-6" id="counter">
-        <div class="alert alert-success">Example of the successful alert box</div>
       </div>
     </div>
     
     <div class="row">
-      <div class="col-lg-6" id="counter">
-        <div class="alert alert-warning">Example of a failed alert box</div>
-      </div>
-
-    </div>
-
-    <div class="row">
-      <div class="col-lg-6" id="history">
+      <div class="col-md-6 col-md-offset-3" id="history">
         <hr>
-        <h2>History</h2>
         <ul class="list-group">
         </ul>
       </div>
       
     </div>
+   </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     
     <script src="js/jquery-1.11.0.js"></script>
@@ -69,7 +60,6 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/date.format.js"></script>
     <script>
-      $("#running").hide();
       $(".alert").hide();
       var globalState = {};
       
@@ -91,7 +81,7 @@
          var startTime = (new Date()).getTime();
                          
          var timer = setInterval(function () {
-                                 var secondsLeft = calculateTimeRemaining(startTime, 8);
+                                 var secondsLeft = calculateTimeRemaining(startTime, durationSeconds);
                                  $("#counter").text(showTimeRemaining(secondsLeft));
                                  if (secondsLeft <= 0) {
                                    clearTimeout(timer);
@@ -101,7 +91,8 @@
        }
       
      function pomodoroComplete(success) {
-         if (globalState.state !== "InPomodoro") {
+
+         if (globalState.state !== "Active") {
             return;
          }
          var title = globalState.currentPomodoro;
@@ -110,58 +101,50 @@
          if (success) {                                                    
              alertElement = $(".alert-success");
              alertElement.html("Pomodoro completed");
-             msgClass = "list-group-item-success";                                                    
+             msgClass = "list-group-item";                                                    
                                                     
          } else {
              alertElement = $(".alert-warning");
              alertElement.html("Pomodoro cancelled");
              msgClass = "list-group-item-warning";
          }                                                    
-         alertElement.fadeIn();                 
          var finishTime = new Date();
-         setTimeout(function() { alertElement.fadeOut(2000); }, 2000);
-         $("#history ul").prepend("<li class=\"" + msgClass + "\">" + 
-                                                title + " " + 
-                                                finishTime.format("m/d/yy hh:mm TT") +
+         console.log(title);                                                    
+         $("#history ul").prepend("<li class=\"" + msgClass + "\">  <span class=\"pomo-title\">" +
+                                                     "</span>" + title + "<span class=\"pomo-end\"> " + 
+                                                    finishTime.format("m/d/yy hh:mm TT") + "</span>" +
                                   "</li>");
                                                     
      }                                                    
                                                     
      function readyForNext() {
-       $(".input-group").show();
-       $("#running").hide(1000);
+       $("input").prop("disabled", false);
+       $("input").val("");
      }
                                                     
      function updateState(state) {
         globalState.state = state;                                                    
-        $("h1").html(state);                                                             
+        $("#state").html(state);
      };
 
                                                     
-     $("#cancel-button").click(function() {
-        if (globalState.state === "InPomodoro") {
-             pomodoroComplete(false);
-             updateState("Ready?");
-             readyForNext();                                                           
-        }                                                     
-     });                                                    
-                                                    
      $("#go-button").click(function() {
         var startTime = (new Date()).getTime();
-        globalState.currentPomodoro = $("#pomo-title").val();
-        updateState("InPomodoro");
-        var timer = startTimer(8, function() {
+
+        var timer = startTimer(10, function() {
                          pomodoroComplete(true);
-                         updateState("Resting");
+                         updateState("Break");
                          startTimer(5, function() {
                                           updateState("Ready?");
                                           readyForNext();
                                        });
                       });
+
+        globalState.currentPomodoro = $("#pomo-title").val();
+        updateState("Active");
         globalState.timer = timer;
-        $(".input-group").hide();
-        $("#running").show();
-        
+        $("input").prop("disabled", true);
+
       });
     </script>
   </body>
