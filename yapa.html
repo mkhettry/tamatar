@@ -23,7 +23,7 @@
 
     <div class="row">
       <div class="col-md-1" id="state">
-        Waiting
+        Ready?
       </div>
     </div>
 
@@ -129,6 +129,7 @@
       $("input").val("");
       $("#go-button").show();
       $("#cancel-button").hide();
+      updateState("Ready?");
       document.title = "yapa";
     }
 
