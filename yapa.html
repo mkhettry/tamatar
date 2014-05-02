@@ -118,7 +118,7 @@
       console.log(title);
       $("#history ul").prepend("<li class=\"" + msgClass + "\">  <span class=\"pomo-title\">" +
       "</span>" + title + "<span class=\"pomo-end\"> " +
-      finishTime.format("m/d/yy hh:MM TT") + "</span>" +
+      finishTime.format("mm/dd/yy hh:MM TT") + "</span>" +
       "</li>");
       $("#counter").html("25.00");
 
@@ -144,7 +144,7 @@
       readyForNext();
     });
 
-    $("#go-button").click(function() {
+    function startPomodoro() {
       updateState("Pomodoro");
 
       startTimer(60 * 25, function() {
@@ -159,7 +159,16 @@
       globalState.currentPomodoro = $("#pomo-title").val();
 
       $("input").prop("disabled", true);
+    };
 
+    $("#go-button").click(function() {
+      startPomodoro();
+    });
+
+    $("input").keypress(function (e) {
+      if (e.which == 13) {
+        startPomodoro();
+      }
     });
     </script>
   </body>
