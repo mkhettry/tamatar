@@ -9,6 +9,7 @@
   <!-- Bootstrap -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/app.css" rel="stylesheet">
+  <link href="css/ui-lightness/jquery-ui-1.10.4.min.css" rel="stylesheet">
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -57,9 +58,14 @@
   <script src="js/jquery-1.11.0.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/date.format.js"></script>
+  <script src="js/jquery-ui-1.10.4.js"></script>
+
   <script>
-  var globalState = {};
-  $("#cancel-button").hide();
+    var globalState = {};
+    console.log($("#cancel-button"));
+    globalState.pomodoros = [];
+
+    $("#cancel-button").hide();
 
   function calculateTimeRemaining(startTime, durationSeconds) {
     var secondsElapsed = ((new Date()).getTime() - startTime) / 1000;
@@ -99,7 +105,7 @@
     }
 
     function pomodoroComplete(success) {
-      console.log(globalState.state);
+      globalState.pomodoros.push(globalState.currentPomodoro);
       if (globalState.state !== "Pomodoro") {
         return;
       }
@@ -170,6 +176,18 @@
         startPomodoro();
       }
     });
+
+    $("input").autocomplete({source: function(input, callback) {
+      console.log(input.term);
+      var matches = [];      
+      for (var i = 0; i < globalState.pomodoros.length; ++i) {
+        console.log(globalState.pomodoros[i]);
+        if (globalState.pomodoros[i].indexOf(input.term) > -1) {
+          matches.push(globalState.pomodoros[i]);
+        }
+      }
+      callback(matches);
+    }});
     </script>
   </body>
   </html>
