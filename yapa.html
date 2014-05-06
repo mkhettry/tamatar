@@ -63,7 +63,7 @@
   <script>
     var globalState = {};
     console.log($("#cancel-button"));
-    globalState.pomodoros = [];
+    globalState.pomodoros = {};
 
     $("#cancel-button").hide();
 
@@ -105,7 +105,7 @@
     }
 
     function pomodoroComplete(success) {
-      globalState.pomodoros.push(globalState.currentPomodoro);
+      globalState.pomodoros[globalState.currentPomodoro] = 1;
       if (globalState.state !== "Pomodoro") {
         return;
       }
@@ -179,11 +179,13 @@
 
     $("input").autocomplete({source: function(input, callback) {
       console.log(input.term);
-      var matches = [];      
-      for (var i = 0; i < globalState.pomodoros.length; ++i) {
-        console.log(globalState.pomodoros[i]);
-        if (globalState.pomodoros[i].indexOf(input.term) > -1) {
-          matches.push(globalState.pomodoros[i]);
+      var matches = [];
+      for (var key in globalState.pomodoros) {
+        if (globalState.pomodoros.hasOwnProperty(key)) {
+          console.log(key);
+          if (key.indexOf(input.term) > -1) {
+            matches.push(key);
+          }
         }
       }
       callback(matches);
