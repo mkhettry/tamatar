@@ -61,11 +61,20 @@
   <script src="js/jquery-ui-1.10.4.js"></script>
 
   <script>
+  $(function(){
     var globalState = {};
-    console.log($("#cancel-button"));
     globalState.pomodoros = {};
 
     $("#cancel-button").hide();
+    var completedPomodoros = JSON.parse(localStorage['yapa.pomodoroComplete']);
+    console.log(completedPomodoros);
+    var start = 0;
+    if (completedPomodoros.length > 10) {
+      start = completedPomodoros.length - 10;
+    }
+    for (var i = start; start < completedPomodoros.length; i++) {
+      displayPomodoro(completedPomodoros[i]);
+    }
 
   function calculateTimeRemaining(startTime, durationSeconds) {
     var secondsElapsed = ((new Date()).getTime() - startTime) / 1000;
@@ -105,6 +114,8 @@
     }
 
     function pomodoroComplete(success) {
+      var pomodoroHash = {}
+
       globalState.pomodoros[globalState.currentPomodoro] = 1;
       if (globalState.state !== "Pomodoro") {
         return;
@@ -113,22 +124,46 @@
       if (title == "") {
         title = "anonymous";
       }
-      var msgClass = null;
-      if (success) {
-        msgClass = "list-group-item";
+      pomodoroHash['title'] = title;
 
+      pomodoroHash['success'] = success;
+
+      var finishTime = new Date();
+      var finishTimeDisplayable = finishTime.format("mm/dd/yy hh:MM TT");     
+      pomodoroHash['finishTime'] = finishTimeDisplayable;
+
+      
+      insertPomodoroToLocalStorage(pomodoroHash);
+      displayPomodoro(pomodoroHash);
+    };
+
+    function displayPomodoro(pomodoroHash) {
+      var msgClass = null;
+      if (pomodoroHash['success']) {
+        msgClass = "list-group-item";
       } else {
         msgClass = "list-group-item list-group-item-warning";
       }
-      var finishTime = new Date();
-      console.log(title);
+
+
       $("#history ul").prepend("<li class=\"" + msgClass + "\">  <span class=\"pomo-title\">" +
-      "</span>" + title + "<span class=\"pomo-end\"> " +
-      finishTime.format("mm/dd/yy hh:MM TT") + "</span>" +
+      "</span>" + pomodoroHash['title'] + "<span class=\"pomo-end\"> " +
+      pomodoroHash['finishTime'] + "</span>" +
       "</li>");
       $("#counter").html("25.00");
 
-    }
+    };
+    function insertPomodoroToLocalStorage(pomodoroHash) {
+      var pomodoroList = [];
+      if (localStorage['yapa.pomodoroComplete']) {
+        pomodoroList = JSON.parse(localStorage['yapa.pomodoroComplete']);
+      } else {
+        pomodoroList = [];
+      }
+
+      pomodoroList.push(pomodoroHash);
+      localStorage['yapa.pomodoroComplete'] = JSON.stringify(pomodoroList);
+    };
 
     function readyForNext() {
       $("input").prop("disabled", false);
@@ -182,7 +217,6 @@
       var matches = [];
       for (var key in globalState.pomodoros) {
         if (globalState.pomodoros.hasOwnProperty(key)) {
-          console.log(key);
           if (key.indexOf(input.term) > -1) {
             matches.push(key);
           }
@@ -190,6 +224,7 @@
       }
       callback(matches);
     }});
+  });
     </script>
   </body>
   </html>
