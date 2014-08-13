@@ -15,3 +15,7 @@ input {
     border-left: 1px solid;
     padding-left: 10px;
 }
+
+.today-status {
+	float: right;
+}

@@ -26,6 +26,9 @@
       <div class="col-md-1" id="state">
         Ready?
       </div>
+      <div class="col-md-1 col-md-offset-10 today-status">
+      4/1
+      </div> 
     </div>
 
     <div class="row" id="running">
@@ -64,15 +67,25 @@
   $(function(){
     var globalState = {};
     globalState.pomodoros = {};
-
+    console.log("I came here");
     $("#cancel-button").hide();
-    var completedPomodoros = JSON.parse(localStorage['yapa.pomodoroComplete']);
+    var completedPomodoros;
+
+    if (localStorage['yapa.pomodoroComplete']) {
+      completedPomodoros = JSON.parse(localStorage['yapa.pomodoroComplete']);
+    } else {
+      completedPomodoros = [];
+    }
+
     console.log(completedPomodoros);
     var start = 0;
     if (completedPomodoros.length > 10) {
       start = completedPomodoros.length - 10;
     }
-    for (var i = start; start < completedPomodoros.length; i++) {
+    console.log(completedPomodoros.length);
+    for (var i = start; i < completedPomodoros.length; i++) {
+      console.log(i);
+      console.log(completedPomodoros[i]);
       displayPomodoro(completedPomodoros[i]);
     }
 
@@ -139,6 +152,7 @@
 
     function displayPomodoro(pomodoroHash) {
       var msgClass = null;
+      console.log(pomodoroHash);
       if (pomodoroHash['success']) {
         msgClass = "list-group-item";
       } else {
